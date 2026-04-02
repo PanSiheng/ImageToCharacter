@@ -1,0 +1,35 @@
+name: Build Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: ImageToCharacter-windows
+            ext: .exe
+          - os: macos-latest
+            artifact: ImageToCharacter-macos
+            ext: ''
+          - os: ubuntu-latest
+            artifact: ImageToCharacter-linux
+            ext: ''
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          g++ -std=c++17 -O2 main.cpp -o ImageToCharacter${{ matrix.ext }}
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ImageToCharacter${{ matrix.ext }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
